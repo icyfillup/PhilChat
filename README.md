@@ -1,5 +1,5 @@
-#Flappy Bird
-Objective: Understand more about Java Game programming.
+#PhilChat
+Objective: Understand more about Network programming.
 
 Important git commands
 
