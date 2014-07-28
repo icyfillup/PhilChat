@@ -1,15 +1,16 @@
 package com.icyfillup.philchat;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame
 {
@@ -18,8 +19,8 @@ public class Login extends JFrame
 	private JTextField	txtName;
 	private JTextField txtAddress;
 	private JTextField txtPort;
-	private JLabel lbleg;
-	private JLabel lbleg_1;
+	private JLabel lblAddressDesc;
+	private JLabel lblPortDesc;
 	
 	public Login()
 	{
@@ -29,7 +30,6 @@ public class Login extends JFrame
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -44,7 +44,6 @@ public class Login extends JFrame
 		contentPane.setLayout(null);
 		
 		txtName = new JTextField();
-		txtName.setText("bob");
 		txtName.setBounds(84, 20, 126, 20);
 		contentPane.add(txtName);
 		txtName.setColumns(10);
@@ -71,17 +70,33 @@ public class Login extends JFrame
 		txtPort.setBounds(84, 98, 86, 20);
 		contentPane.add(txtPort);
 		
-		lbleg = new JLabel("(eg. 123.158.5.0) ");
-		lbleg.setBounds(84, 77, 96, 14);
-		contentPane.add(lbleg);
+		lblAddressDesc = new JLabel("(eg. 123.158.5.0) ");
+		lblAddressDesc.setBounds(84, 77, 96, 14);
+		contentPane.add(lblAddressDesc);
 		
-		lbleg_1 = new JLabel("(eg. 1511)");
-		lbleg_1.setBounds(84, 116, 69, 14);
-		contentPane.add(lbleg_1);
+		lblPortDesc = new JLabel("(eg. 1511)");
+		lblPortDesc.setBounds(84, 116, 69, 14);
+		contentPane.add(lblPortDesc);
 		
 		JButton btnLogin = new JButton("Login");
+		btnLogin.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = txtName.getText();
+				String address = txtAddress.getText();
+				int port = Integer.parseInt(txtPort.getText());
+				login(name, address, port);
+			}
+		});
 		btnLogin.setBounds(102, 163, 89, 23);
 		contentPane.add(btnLogin);
+	}
+	
+	private void login(String name, String address, int port)
+	{
+		dispose();
+		new Client(name, address, port);
 	}
 	
 	public static void main(String[] args)
