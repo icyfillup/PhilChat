@@ -1,26 +1,23 @@
 package com.icyfillup.philchat;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
-
 import java.awt.GridBagConstraints;
-import javax.swing.JButton;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.JTextField;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 public class Client extends JFrame
 {
@@ -31,7 +28,10 @@ public class Client extends JFrame
 	private String name, address;
 	private int port;
 	private JTextField txtMessage;
-	private JTextArea txtrHistory;
+	private JTextArea history;
+	
+	private DatagramSocket socket;
+	private InetAddress ip;
 	
 	public Client(String name, String address, int port)
 	{
@@ -39,9 +39,19 @@ public class Client extends JFrame
 		this.name = name;
 		this.address = address;
 		this.port = port;
-		
+		boolean connect = openConnection(address, port);
+		if(!connect)
+		{
+			System.err.println("Connection Failed");
+			console("Connection Failed");
+		}
 		createWindow();
 		console("Attempting a connection to " + address + ", " + port + ". User: " + name);
+	}
+	
+	private boolean openConnection(String address, int port)
+	{
+		
 	}
 	
 	private void createWindow()
@@ -69,16 +79,18 @@ public class Client extends JFrame
 		gbl_contentPane.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
-		txtrHistory = new JTextArea();
-		txtrHistory.setEditable(false);
-		GridBagConstraints gbc_txtrHistory = new GridBagConstraints();
-		gbc_txtrHistory.insets = new Insets(0, 0, 5, 5);
-		gbc_txtrHistory.fill = GridBagConstraints.BOTH;
-		gbc_txtrHistory.gridx = 1;
-		gbc_txtrHistory.gridy = 1;
-		gbc_txtrHistory.gridwidth = 2;
-		gbc_txtrHistory.insets = new Insets(0, 5, 0, 0);
-		contentPane.add(txtrHistory, gbc_txtrHistory);
+		history = new JTextArea();
+		history.setEditable(false);
+		JScrollPane scroll = new JScrollPane(history);
+		GridBagConstraints scrollConstraints = new GridBagConstraints();
+		scrollConstraints.insets = new Insets(0, 0, 5, 5);
+		scrollConstraints.fill = GridBagConstraints.BOTH;
+		scrollConstraints.gridx = 0;
+		scrollConstraints.gridy = 0;
+		scrollConstraints.gridwidth = 3;
+		scrollConstraints.gridheight = 2;
+		scrollConstraints.insets = new Insets(0, 5, 0, 0);
+		contentPane.add(scroll, scrollConstraints);
 		
 		txtMessage = new JTextField();
 		txtMessage.addKeyListener(new KeyAdapter()
@@ -94,8 +106,9 @@ public class Client extends JFrame
 		GridBagConstraints gbc_txtMessage = new GridBagConstraints();
 		gbc_txtMessage.insets = new Insets(0, 0, 0, 5);
 		gbc_txtMessage.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtMessage.gridx = 1;
+		gbc_txtMessage.gridx = 0;
 		gbc_txtMessage.gridy = 2;
+		gbc_txtMessage.gridwidth = 2;
 		contentPane.add(txtMessage, gbc_txtMessage);
 		txtMessage.setColumns(10);
 		
@@ -127,6 +140,7 @@ public class Client extends JFrame
 	
 	public void console(String message)
 	{
-		txtrHistory.append(message + "\n\r");
+		history.append(message + "\n\r");
+		history.setCaretPosition(history.getDocument().getLength());
 	}
 }
