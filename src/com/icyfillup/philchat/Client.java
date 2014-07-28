@@ -7,8 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -49,9 +52,41 @@ public class Client extends JFrame
 		console("Attempting a connection to " + address + ", " + port + ". User: " + name);
 	}
 	
+	
 	private boolean openConnection(String address, int port)
 	{
-		
+		try
+		{
+			socket = new DatagramSocket(port);
+			ip = InetAddress.getByName(address);
+		}
+		catch (UnknownHostException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		catch (SocketException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private String receive() 
+	{
+		byte[] data = new byte[1024];
+		DatagramPacket packet = new DatagramPacket(data, data.length);
+		try
+		{
+			socket.receive(packet);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		String message = new String(packet.getData());
+		return message;
 	}
 	
 	private void createWindow()
