@@ -27,15 +27,15 @@ public class Client extends JFrame
 {
 	private static final long	serialVersionUID	= 1L;
 	
-	private JPanel				contentPane;
+	private DatagramSocket		socket;
 	
 	private String				name, address;
 	private int					port;
+	private InetAddress			ip;
+	
+	private JPanel				contentPane;
 	private JTextField			txtMessage;
 	private JTextArea			history;
-	
-	private DatagramSocket		socket;
-	private InetAddress			ip;
 	
 	private Thread				send;
 	
@@ -45,7 +45,7 @@ public class Client extends JFrame
 		this.name = name;
 		this.address = address;
 		this.port = port;
-		boolean connect = openConnection(address, port);
+		boolean connect = openConnection(address);
 		if (!connect)
 		{
 			System.err.println("Connection Failed");
@@ -53,13 +53,15 @@ public class Client extends JFrame
 		}
 		createWindow();
 		console("Attempting a connection to " + address + ", " + port + ". User: " + name);
+		String connection = name + " connected from " + address + ": " + port;
+		send(connection.getBytes());
 	}
 	
-	private boolean openConnection(String address, int port)
+	private boolean openConnection(String address)
 	{
 		try
 		{
-			socket = new DatagramSocket(port);
+			socket = new DatagramSocket();
 			ip = InetAddress.getByName(address);
 		}
 		catch (UnknownHostException e)
@@ -91,7 +93,7 @@ public class Client extends JFrame
 		return message;
 	}
 	
-	private void sent(final byte[] data)
+	private void send(final byte[] data)
 	{
 		send = new Thread("Send")
 		{
@@ -156,7 +158,7 @@ public class Client extends JFrame
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					sent(txtMessage.getText());
+					send(txtMessage.getText());
 				}
 			}
 		});
@@ -174,7 +176,7 @@ public class Client extends JFrame
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				sent(txtMessage.getText());
+				send(txtMessage.getText());
 			}
 		});
 		GridBagConstraints gbc_btnSent = new GridBagConstraints();
@@ -187,11 +189,12 @@ public class Client extends JFrame
 		txtMessage.requestFocusInWindow();
 	}
 	
-	private void sent(String message)
+	private void send(String message)
 	{
 		if (message.equals("")) return;
 		message = name + ": " + message;
 		console(message);
+		send(message.getBytes());
 		txtMessage.setText("");
 	}
 	

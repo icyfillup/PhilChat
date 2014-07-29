@@ -1,14 +1,14 @@
 package com.icyfillup.philchat.sever;
 
-public class SeverMain
+public class ServerMain
 {
 	private int		port;
-	private Sever	sever;
+	private Server	server;
 	
-	public SeverMain(int port)
+	public ServerMain(int port)
 	{
 		this.port = port;
-		sever = new Sever(port);
+		server = new Server(port);
 	}
 	
 	public static void main(String[] args)
@@ -16,10 +16,10 @@ public class SeverMain
 		int port;
 		if (args.length != 1)
 		{
-			System.out.println("Usage: java -jar PhilChatSever.jar [port]");
+			System.out.println("Usage: java -jar PhilChatServer.jar [port]");
 			return;
 		}
 		port = Integer.parseInt(args[0]);
-		new SeverMain(port);
+		new ServerMain(port);
 	}
 }
