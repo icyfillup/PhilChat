@@ -1,4 +1,4 @@
-package com.icyfillup.philchat.sever;
+package com.icyfillup.philchat.server;
 
 import java.net.InetAddress;
 
