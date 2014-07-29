@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -26,15 +27,17 @@ public class Client extends JFrame
 {
 	private static final long	serialVersionUID	= 1L;
 	
-	private JPanel	contentPane;
+	private JPanel				contentPane;
 	
-	private String name, address;
-	private int port;
-	private JTextField txtMessage;
-	private JTextArea history;
+	private String				name, address;
+	private int					port;
+	private JTextField			txtMessage;
+	private JTextArea			history;
 	
-	private DatagramSocket socket;
-	private InetAddress ip;
+	private DatagramSocket		socket;
+	private InetAddress			ip;
+	
+	private Thread				send;
 	
 	public Client(String name, String address, int port)
 	{
@@ -43,7 +46,7 @@ public class Client extends JFrame
 		this.address = address;
 		this.port = port;
 		boolean connect = openConnection(address, port);
-		if(!connect)
+		if (!connect)
 		{
 			System.err.println("Connection Failed");
 			console("Connection Failed");
@@ -51,7 +54,6 @@ public class Client extends JFrame
 		createWindow();
 		console("Attempting a connection to " + address + ", " + port + ". User: " + name);
 	}
-	
 	
 	private boolean openConnection(String address, int port)
 	{
@@ -73,7 +75,7 @@ public class Client extends JFrame
 		return true;
 	}
 	
-	private String receive() 
+	private String receive()
 	{
 		byte[] data = new byte[1024];
 		DatagramPacket packet = new DatagramPacket(data, data.length);
@@ -81,12 +83,32 @@ public class Client extends JFrame
 		{
 			socket.receive(packet);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 		String message = new String(packet.getData());
 		return message;
+	}
+	
+	private void sent(final byte[] data)
+	{
+		send = new Thread("Send")
+		{
+			public void run()
+			{
+				DatagramPacket packet = new DatagramPacket(data, data.length, ip, port);
+				try
+				{
+					socket.send(packet);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
+		send.start();
 	}
 	
 	private void createWindow()
@@ -108,10 +130,10 @@ public class Client extends JFrame
 		setContentPane(contentPane);
 		
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{28, 815, 30, 7};
-		gbl_contentPane.rowHeights = new int[]{35, 475, 40};
-		gbl_contentPane.columnWeights = new double[]{1.0, 1.0};
-		gbl_contentPane.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[] { 28, 815, 30, 7 };
+		gbl_contentPane.rowHeights = new int[] { 35, 475, 40 };
+		gbl_contentPane.columnWeights = new double[] { 1.0, 1.0 };
+		gbl_contentPane.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 		
 		history = new JTextArea();
@@ -132,7 +154,7 @@ public class Client extends JFrame
 		{
 			public void keyPressed(KeyEvent e)
 			{
-				if(e.getKeyCode() == KeyEvent.VK_ENTER)
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
 					sent(txtMessage.getText());
 				}
@@ -148,9 +170,9 @@ public class Client extends JFrame
 		txtMessage.setColumns(10);
 		
 		JButton btnSent = new JButton("Sent");
-		btnSent.addActionListener(new ActionListener() 
+		btnSent.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent arg0) 
+			public void actionPerformed(ActionEvent arg0)
 			{
 				sent(txtMessage.getText());
 			}
@@ -167,7 +189,7 @@ public class Client extends JFrame
 	
 	private void sent(String message)
 	{
-		if(message.equals("")) return;
+		if (message.equals("")) return;
 		message = name + ": " + message;
 		console(message);
 		txtMessage.setText("");

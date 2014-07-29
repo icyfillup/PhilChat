@@ -17,10 +17,10 @@ public class Login extends JFrame
 	
 	private JPanel		contentPane;
 	private JTextField	txtName;
-	private JTextField txtAddress;
-	private JTextField txtPort;
-	private JLabel lblAddressDesc;
-	private JLabel lblPortDesc;
+	private JTextField	txtAddress;
+	private JTextField	txtPort;
+	private JLabel		lblAddressDesc;
+	private JLabel		lblPortDesc;
 	
 	public Login()
 	{
