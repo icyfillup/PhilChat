@@ -20,7 +20,7 @@ public class Client extends JFrame
 	private InetAddress			ip;
 	private Thread				send;
 	
-	private int ID = -1;
+	private int					ID					= -1;
 	
 	public Client(String name, String address, int port)
 	{
@@ -93,6 +93,21 @@ public class Client extends JFrame
 			}
 		};
 		send.start();
+	}
+	
+	public void close()
+	{
+		new Thread()
+		{
+			public void run()
+			{
+				synchronized (socket)
+				{
+					socket.close();
+				}				
+			}
+		}.start();
+		
 	}
 	
 	public void setID(int ID)

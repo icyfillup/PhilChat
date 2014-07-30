@@ -12,7 +12,7 @@ public class ServerClient
 	
 	public ServerClient(String name, InetAddress address, int port, final int ID)
 	{
-		this.name = name;
+		this.name = name.trim();
 		this.address = address;
 		this.port = port;
 		this.ID = ID;
