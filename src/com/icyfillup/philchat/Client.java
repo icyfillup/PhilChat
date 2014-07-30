@@ -18,8 +18,9 @@ public class Client extends JFrame
 	private String				name, address;
 	private int					port;
 	private InetAddress			ip;
-	
 	private Thread				send;
+	
+	private int ID = -1;
 	
 	public Client(String name, String address, int port)
 	{
@@ -94,4 +95,13 @@ public class Client extends JFrame
 		send.start();
 	}
 	
+	public void setID(int ID)
+	{
+		this.ID = ID;
+	}
+	
+	public int getID()
+	{
+		return ID;
+	}
 }

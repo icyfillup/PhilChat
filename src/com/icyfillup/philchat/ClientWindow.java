@@ -17,15 +17,16 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-public class ClientWindow extends JFrame
+public class ClientWindow extends JFrame implements Runnable
 {
 	private static final long	serialVersionUID	= 1L;
 	
 	private JPanel				contentPane;
 	private JTextField			txtMessage;
 	private JTextArea			history;
-	
+	private Thread				run, listen;
 	private Client				client;
+	private boolean				running				= false;
 	
 	public ClientWindow(String name, String address, int port)
 	{
@@ -42,6 +43,9 @@ public class ClientWindow extends JFrame
 		console("Attempting a connection to " + address + ", " + port + ". User: " + name);
 		String connection = "/c/" + name;
 		client.send(connection.getBytes());
+		running = true;
+		run = new Thread(this, "Run");
+		run.start();
 	}
 	
 	private void createWindow()
@@ -120,14 +124,44 @@ public class ClientWindow extends JFrame
 		txtMessage.requestFocusInWindow();
 	}
 	
+	public void run()
+	{
+		listen();
+	}
+	
 	private void send(String message)
 	{
 		if (message.equals("")) return;
 		message = client.getName() + ": " + message;
-		console(message);
 		message = "/m/" + message;
 		client.send(message.getBytes());
 		txtMessage.setText("");
+	}
+	
+	public void listen()
+	{
+		listen = new Thread("Listen") 
+		{
+			public void run()
+			{
+				while(running) 
+				{
+					String message = client.receive();
+					if(message.startsWith("/c/"))
+					{
+						
+						client.setID(Integer.parseInt(message.split("/c/|/e/")[1]));
+						console("Successfully connected to server! ID: " + client.getID());
+					}
+					else if(message.startsWith("/m/"))
+					{
+						String text = message.split("/m/|/e/")[1];
+						console(text);
+					}
+				}
+			}
+		};
+		listen.start();
 	}
 	
 	public void console(String message)

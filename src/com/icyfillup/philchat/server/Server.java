@@ -74,9 +74,6 @@ public class Server implements Runnable
 						e.printStackTrace();
 					}
 					process(packet);
-					String string = new String(packet.getData());
-					clients.add(new ServerClient("phil", packet.getAddress(), packet.getPort(), 50));
-					System.out.println(clients.get(0).address.toString() + ": " + clients.get(0).port);
 				}
 			}
 		};
@@ -88,7 +85,7 @@ public class Server implements Runnable
 		for(int i = 0; i < clients.size(); i++)
 		{
 			ServerClient client = clients.get(i);
-			send(message.getBytes(), clients.get(i).address, clients.get(i).port);
+			send(message.getBytes(), client.address, client.port);
 		}
 	}
 	
@@ -112,6 +109,12 @@ public class Server implements Runnable
 		send.start();
 	}
 	
+	private void send(String message, InetAddress address, int port)
+	{
+		message += "/e/";
+		send(message.getBytes(), address, port);
+	}
+	
 	private void process(DatagramPacket packet)
 	{
 		String string = new String(packet.getData());
@@ -122,6 +125,8 @@ public class Server implements Runnable
 			System.out.println("id: " + id);
 			clients.add(new ServerClient(string.substring(3, string.length()), packet.getAddress(), packet.getPort(), id));
 			System.out.println("Sever.process_1. " + string.substring(3, string.length()));
+			String ID = "/c/" + id;
+			send(ID, packet.getAddress(), packet.getPort());
 		}
 		else if(string.startsWith("/m/"))
 		{
