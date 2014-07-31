@@ -126,6 +126,7 @@ public class Server implements Runnable
 				printHelp();
 			}
 		}
+		scanner.close();
 	}
 	
 	private void printHelp()
