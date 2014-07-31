@@ -56,6 +56,9 @@ public class Server implements Runnable
 			text = text.substring(1);
 			if(text.equals("raw"))
 			{
+				if(raw)
+				{System.out.println("raw mode off");}
+				else {System.out.println("raw mode on");}
 				raw = !raw;
 			}
 			else if(text.equals("clients"))
@@ -109,7 +112,32 @@ public class Server implements Runnable
 					}
 				}
 			}
+			else if(text.equals("quit"))
+			{
+				quit();
+			}
+			else if(text.equals("help"))
+			{
+				printHelp();
+			}
+			else
+			{
+				System.out.println("Unknown command.");
+				printHelp();
+			}
 		}
+	}
+	
+	private void printHelp()
+	{
+		System.out.println("Here is a list of all available commands.");
+		System.out.println("===========================================");
+		System.out.println("/raw - enable raw mode");
+		System.out.println("/kick [users ID or username] - kick user");
+		System.out.println("/help - show this help message");
+		System.out.println("/quit - shuts down server.");
+		
+		
 	}
 	
 	private void manageClients()
@@ -182,6 +210,7 @@ public class Server implements Runnable
 					{
 						socket.receive(packet);
 					}
+					catch (SocketException e) {}
 					catch (IOException e)
 					{
 						e.printStackTrace();
@@ -267,6 +296,16 @@ public class Server implements Runnable
 		{
 			System.out.println("Sever.process_2. " + string);
 		}
+	}
+	
+	private void quit()
+	{
+		for(int i = 0; i < clients.size(); i++)
+		{
+			disconnect(clients.get(i).getID(), true);
+		}
+		running = false;
+		socket.close();
 	}
 	
 	private void disconnect(int id, boolean status)
