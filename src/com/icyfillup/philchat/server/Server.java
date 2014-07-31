@@ -121,6 +121,7 @@ public class Server implements Runnable
 				while (running)
 				{
 					sendToAll("/i/server");
+					sendStatus();
 					try
 					{
 						Thread.sleep(2000);
@@ -154,6 +155,17 @@ public class Server implements Runnable
 			}
 		};
 		manage.start();
+	}
+	private void sendStatus()
+	{
+		if(clients.size() <= 0) {return;}
+		String users = "/u/";
+		for(int i = 0; i < clients.size() - 1; i++)
+		{
+			users += clients.get(i).name + "/n/";
+		}
+		users += clients.get(clients.size() - 1).name + "/e/";
+		sendToAll(users);
 	}
 	
 	private void receive()
@@ -189,7 +201,7 @@ public class Server implements Runnable
 			text = text.split("/e/")[0];
 			System.out.println(message);			
 		}
-		
+
 		for (int i = 0; i < clients.size(); i++)
 		{
 			ServerClient client = clients.get(i);
@@ -283,7 +295,7 @@ public class Server implements Runnable
 		{
 			message = "Client " + c.name + " (" + c.getID() + ") @ " + c.address.toString() + ": " + c.port + " timed out.";
 		}
-		System.out.print(message);
+		System.out.println(message);
 	}
 	
 }
